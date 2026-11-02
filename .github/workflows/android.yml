@@ -1,0 +1,43 @@
+name: DUOTALK Android Build
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - основной
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Получить исходный код
+        uses: actions/checkout@v4
+
+      - name: Установить Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Установить Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - name: Создать Android-проект
+        run: |
+          flutter create --platforms=android --project-name duotalk --org com.duotalk /tmp/duotalk_scaffold
+          cp -R /tmp/duotalk_scaffold/android ./android
+
+      - name: Установить зависимости
+        run: flutter pub get
+
+      - name: Собрать APK
+        run: flutter build apk --release
+
+      - name: Сохранить APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: DUOTALK-APK
+          path: build/app/outputs/flutter-apk/app-release.apk
