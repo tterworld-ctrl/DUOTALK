@@ -27,6 +27,27 @@ jobs:
       - name: Создать Android-проект
         run: flutter create --platforms=android --project-name duotalk --org com.duotalk .
 
+      - name: Добавить разрешение микрофона
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          manifest = Path("android/app/src/main/AndroidManifest.xml")
+          content = manifest.read_text()
+
+          permission = '<uses-permission android:name="android.permission.RECORD_AUDIO"/>'
+
+          if permission not in content:
+              content = content.replace(
+                  '<application',
+                  permission + '\n    <application',
+                  1
+              )
+              manifest.write_text(content)
+
+          print("Разрешение микрофона добавлено")
+          PY
+
       - name: Установить зависимости
         run: flutter pub get
 
