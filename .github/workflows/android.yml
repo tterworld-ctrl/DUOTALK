@@ -1,43 +1,24 @@
-name: DUOTALK Android Build
+name: duotalk
+description: DUOTALK multilingual translator
+publish_to: 'none'
+version: 1.0.0+1
 
-on:
-  workflow_dispatch:
-  push:
-    branches:
-      - основной
+environment:
+  sdk: '>=3.3.0 <4.0.0'
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+  speech_to_text: ^7.0.0
+  flutter_tts: ^4.2.0
+  image_picker: ^1.1.2
+  google_mlkit_text_recognition: ^0.15.0
 
-    steps:
-      - name: Получить исходный код
-        uses: actions/checkout@v4
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
 
-      - name: Установить Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: '17'
-
-      - name: Установить Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          channel: stable
-
-      - name: Создать Android-проект
-        run: |
-          flutter create --platforms=android --project-name duotalk --org com.duotalk /tmp/duotalk_scaffold
-          cp -R /tmp/duotalk_scaffold/android ./android
-
-      - name: Установить зависимости
-        run: flutter pub get
-
-      - name: Собрать APK
-        run: flutter build apk --release
-
-      - name: Сохранить APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: DUOTALK-APK
-          path: build/app/outputs/flutter-apk/app-release.apk
+flutter:
+  uses-material-design: true
