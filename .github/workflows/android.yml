@@ -1,62 +1,25 @@
 
-name: DUOTALK Android Build
+name: duotalk
+description: DUOTALK multilingual translator
+publish_to: 'none'
+version: 1.0.0+1
 
-on:
-  push:
-  workflow_dispatch:
+environment:
+  sdk: '>=3.3.0 <4.0.0'
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
+dependencies:
+  flutter:
+    sdk: flutter
 
-    steps:
-      - name: Получить исходный код
-        uses: actions/checkout@v4
+  cupertino_icons: ^1.0.8
+  speech_to_text: ^7.0.0
+  flutter_tts: ^4.2.0
+  image_picker: ^1.1.2
 
-      - name: Установить Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: '17'
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
 
-      - name: Установить Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          channel: stable
-
-      - name: Создать Android-проект
-        run: flutter create --platforms=android --project-name duotalk --org com.duotalk .
-
-      - name: Отключить минификацию R8
-        run: |
-          python3 - <<'PY'
-          from pathlib import Path
-
-          files = [
-              Path("android/app/build.gradle"),
-              Path("android/app/build.gradle.kts")
-          ]
-
-          for file in files:
-              if file.exists():
-                  text = file.read_text()
-                  text = text.replace("isMinifyEnabled = true", "isMinifyEnabled = false")
-                  text = text.replace("minifyEnabled true", "minifyEnabled false")
-                  text = text.replace("isShrinkResources = true", "isShrinkResources = false")
-                  text = text.replace("shrinkResources true", "shrinkResources false")
-                  file.write_text(text)
-                  print(f"Настройки обновлены: {file}")
-
-          PY
-
-      - name: Установить зависимости
-        run: flutter pub get
-
-      - name: Собрать APK
-        run: flutter build apk --release
-
-      - name: Сохранить APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: DUOTALK-APK
-          path: build/app/outputs/flutter-apk/app-release.apk
+flutter:
+  uses-material-design: true
