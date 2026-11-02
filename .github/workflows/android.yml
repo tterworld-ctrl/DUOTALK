@@ -1,3 +1,4 @@
+
 name: DUOTALK Android Build
 
 on:
@@ -26,11 +27,33 @@ jobs:
       - name: Создать Android-проект
         run: flutter create --platforms=android --project-name duotalk --org com.duotalk .
 
+      - name: Отключить минификацию R8
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          files = [
+              Path("android/app/build.gradle"),
+              Path("android/app/build.gradle.kts")
+          ]
+
+          for file in files:
+              if file.exists():
+                  text = file.read_text()
+                  text = text.replace("isMinifyEnabled = true", "isMinifyEnabled = false")
+                  text = text.replace("minifyEnabled true", "minifyEnabled false")
+                  text = text.replace("isShrinkResources = true", "isShrinkResources = false")
+                  text = text.replace("shrinkResources true", "shrinkResources false")
+                  file.write_text(text)
+                  print(f"Настройки обновлены: {file}")
+
+          PY
+
       - name: Установить зависимости
         run: flutter pub get
 
       - name: Собрать APK
-        run: flutter build apk --release --no-shrink
+        run: flutter build apk --release
 
       - name: Сохранить APK
         uses: actions/upload-artifact@v4
